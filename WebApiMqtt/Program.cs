@@ -52,7 +52,7 @@ namespace WebApiMqtt
             {
                 return dBService.GetData();
             });
-
+            dBService.LoopData();
             app.Run();
         }
     }

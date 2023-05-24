@@ -29,11 +29,11 @@ namespace Services.MqttService
                 var mqttClientOptions = new MqttClientOptionsBuilder()
                     .WithTls()
                     .WithTcpServer("dd3284e565894d2a941755a18191be1d.s2.eu.hivemq.cloud")
-                    .WithClientId("API-Sub")
+                    .WithClientId("Lukas-API-Sub")
                     .WithCleanSession(false)
                     .WithCleanStart(false)
                     .WithWillQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
-                    .WithCredentials("TelemetryAPI", "dQeQ8U+H")
+                    .WithCredentials("ArduinoTelemetryTest", "5f8UeQ9G")
                     .Build();
 
                 // Setup message handling before connecting so that queued messages
@@ -63,7 +63,7 @@ namespace Services.MqttService
                     .WithTopicFilter(
                         f =>
                         {
-                            f.WithTopic("lukas/Telemetry");
+                            f.WithTopic("+/+/climate");
                         })
                     .Build();
 

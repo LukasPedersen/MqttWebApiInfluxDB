@@ -8,12 +8,30 @@ using System.Threading.Tasks;
 using static MQTTnet.Samples.Helpers.ObjectExtensions;
 using System.Globalization;
 using InfluxDB.Client.Linq;
+using System.Net;
 
 namespace Services.MqttService
 {
     public class InfluxDBService
     {
-        private string Token = "2RXocPA9ZEVzh2losh1CUvORek70ZxJ04bZJQLlraaycc2PQfa2QO0XeDQJv22mzY7wHXHaTIWq7ZEGtEN1nnQ==";
+        public int randomTemp
+        {
+            get
+            {
+                Random rnd = new Random();
+                return rnd.Next(18, 28);
+            }
+        }
+        public int randomHumit
+        {
+            get
+            {
+                Random rnd = new Random();
+                return rnd.Next(50, 80);
+            }
+        }
+
+        private string Token = "acv-8n3_PLB1CCzim9C8XA0o7IM41uGpcg8oeouzbBQDXBkEy5FVM8BzwH7MU-nF9PUyvQOgRVRBezJMAZJafg==";
         public void Publish(Telemetry newTelemetry)
         {
             using var client = new InfluxDBClient("https://eu-central-1-1.aws.cloud2.influxdata.com", Token);
@@ -27,8 +45,28 @@ namespace Services.MqttService
         {
             using var client = new InfluxDBClient("https://eu-central-1-1.aws.cloud2.influxdata.com", Token);
             var queryApi = client.GetQueryApiSync();
-            var query = from s in InfluxDBQueryable<Telemetry>.Queryable("HouseWatcher", "b8fb8b6306ae7726", queryApi) select s; 
-            return query.ToList();
+            var query = from s in InfluxDBQueryable<Telemetry>.Queryable("HouseWatcher", "b8fb8b6306ae7726", queryApi) select s;
+            List<Telemetry> data = new();
+            foreach (Telemetry tele in query.ToList())
+            {
+                tele.Time.AddHours(2);
+                data.Add(tele);
+            }
+            return data;
+        }
+
+        public async Task LoopData()
+        {
+            while (true)
+            {
+                await Task.Delay(60000);
+
+                using var client = new InfluxDBClient("https://eu-central-1-1.aws.cloud2.influxdata.com", Token);
+                using (var writeApi = client.GetWriteApi())
+                {
+                    writeApi.WriteRecord($"home,room=Kontor temperature={Convert.ToDouble(randomTemp).ToString("F", new CultureInfo("en-US"))},humidity={Convert.ToDouble(randomHumit).ToString("F", new CultureInfo("en-US"))}", WritePrecision.S, "HouseWatcher", "b8fb8b6306ae7726");
+                }
+            }
         }
     }
 }
