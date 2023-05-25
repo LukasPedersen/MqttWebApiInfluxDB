@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using Services.MqttService;
 using static MQTTnet.Samples.Helpers.ObjectExtensions;
+using WebApiMqtt.Hubs;
 
 namespace WebApiMqtt
 {
@@ -21,6 +22,7 @@ namespace WebApiMqtt
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSignalR();
 
             var app = builder.Build();
 
@@ -34,6 +36,7 @@ namespace WebApiMqtt
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+            app.MapHub<ChillWathcerHub>("/ChillWatcherHub");
 
             InfluxDBService dBService = new();
             app.MapPost("/setLED", async (string info, IMqttClientPublish service) =>

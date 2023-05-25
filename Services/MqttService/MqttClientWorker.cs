@@ -52,8 +52,6 @@ namespace Services.MqttService
                     {
 
                     }
-
-                    e.DumpToConsole();
                     return Task.CompletedTask;
                 };
 

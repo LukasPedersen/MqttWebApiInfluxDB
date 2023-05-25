@@ -13,29 +13,6 @@ namespace MQTTnet.Samples.Helpers;
 
 public static class ObjectExtensions
 {
-    public static TObject DumpToConsole<TObject>(this TObject @object)
-    {
-        var output = "NULL";
-        if (@object != null)
-        {
-            output = JsonSerializer.Serialize(@object, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-        }
-
-        //Works
-        PayloadObject response = JsonSerializer.Deserialize<PayloadObject>(output);
-
-        byte[] byteArray = response.ApplicationMessage.PayloadSegment.SelectMany(BitConverter.GetBytes).ToArray();
-        Console.WriteLine($"Message:");
-        string message = Encoding.UTF8.GetString(byteArray);
-
-        Console.WriteLine(message);
-        Console.WriteLine();
-        return @object;
-    }
-
     #region Payload objects
     public class ApplicationMessage
     {
@@ -79,4 +56,11 @@ public static class ObjectExtensions
         public DateTime Time { get; set; }
     }
     #endregion
+
+    public enum BroadCastType
+    {
+        Notification,
+        Warning,
+        Error
+    }
 }
