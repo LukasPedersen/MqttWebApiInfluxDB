@@ -16,7 +16,7 @@ namespace WebApiMqtt
 
             // Add services to the container.
             builder.Services.AddAuthorization();
-            builder.Services.AddHostedService<MqttClientWorker>();
+            //builder.Services.AddHostedService<MqttClientWorker>();
             builder.Services.AddSingleton<IMqttClientPublish, MqttClientPublish>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -55,6 +55,15 @@ namespace WebApiMqtt
             {
                 return dBService.GetData();
             });
+            app.MapGet("/getTelemetryByDate", (IMqttClientPublish service, DateTime from, DateTime to) =>
+            {
+                return dBService.GetData(from.ToUniversalTime(), to.ToUniversalTime());
+            });
+            app.MapPost("/testHub", (IMqttClientPublish service) =>
+            {
+                return dBService.TestHub();
+            });
+            dBService.LoopLiveData();
             dBService.LoopData();
             app.Run();
         }
