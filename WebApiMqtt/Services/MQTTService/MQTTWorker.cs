@@ -1,28 +1,20 @@
-﻿using Microsoft.Extensions.Hosting;
-using MQTTnet.Client;
-using MQTTnet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MQTTnet.Client;
 using MQTTnet.Protocol;
-using MQTTnet.Samples.Helpers;
-using InfluxDB.Client.Api.Domain;
-using Services.MqttService;
-using InfluxDB.Client;
-using static MQTTnet.Samples.Helpers.ObjectExtensions;
+using MQTTnet;
+using WebApiMqtt.Services.InfluxDBService;
+using System.Text;
+using System.Text.Json;
+using static WebApiMqtt.Services.ObjectExtensions;
 
-namespace Services.MqttService
+namespace WebApiMqtt.Services.MQTTService
 {
-    public class MqttClientWorker : BackgroundService
+    public class MQTTWorker : BackgroundService
     {
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Console.WriteLine("Subing to lukas/Telemetry");
             var mqttFactory = new MqttFactory();
-            InfluxDBService dBService = new InfluxDBService();
+            InfluxDBHandler dBService = new InfluxDBHandler();
 
             using (var mqttClient = mqttFactory.CreateMqttClient())
             {

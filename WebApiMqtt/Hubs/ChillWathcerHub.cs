@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using static MQTTnet.Samples.Helpers.ObjectExtensions;
+using static WebApiMqtt.Services.ObjectExtensions;
 
 namespace WebApiMqtt.Hubs
 {

@@ -1,10 +1,7 @@
-using Microsoft.AspNetCore.Http;
-using Services.MqttService;
-using System.Net.Http;
-using System.Text.Json;
-using Services.MqttService;
-using static MQTTnet.Samples.Helpers.ObjectExtensions;
 using WebApiMqtt.Hubs;
+using WebApiMqtt.Services.InfluxDBService;
+using WebApiMqtt.Services.MQTTService;
+using static WebApiMqtt.Services.ObjectExtensions;
 
 namespace WebApiMqtt
 {
@@ -17,7 +14,7 @@ namespace WebApiMqtt
             // Add services to the container.
             builder.Services.AddAuthorization();
             //builder.Services.AddHostedService<MqttClientWorker>();
-            builder.Services.AddSingleton<IMqttClientPublish, MqttClientPublish>();
+            builder.Services.AddSingleton<IMQTTPublish, MQTTPublish>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -26,40 +23,38 @@ namespace WebApiMqtt
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseAuthorization();
             app.MapHub<ChillWathcerHub>("/ChillWatcherHub");
 
-            InfluxDBService dBService = new();
-            app.MapPost("/setLED", async (string info, IMqttClientPublish service) =>
+            InfluxDBHandler dBService = new();
+            app.MapPost("/setLED", async (string info, IMQTTPublish service) =>
             {
                 await service.Publish_Application_Message(info);
             });
-            app.MapPost("/setServo", async (string info, IMqttClientPublish service) =>
+            app.MapPost("/setServo", async (string info, IMQTTPublish service) =>
             {
                 await service.Publish_Application_Message(info);
             });
-            app.MapPost("/createTelemetry", async (Telemetry info, IMqttClientPublish service) =>
+            app.MapPost("/createTelemetry", async (Telemetry info, IMQTTPublish service) =>
             {
                 dBService.Publish(info);
             });
-            app.MapGet("/getTelemetry", (IMqttClientPublish service) =>
+            app.MapGet("/getTelemetry", (IMQTTPublish service) =>
             {
                 return dBService.GetData();
             });
-            app.MapGet("/getTelemetryByDate", (IMqttClientPublish service, DateTime from, DateTime to) =>
+            app.MapGet("/getLatestTelemetry", (IMQTTPublish service) =>
+            {
+                return dBService.GetLatestData();
+            });
+            app.MapGet("/getTelemetryByDate", (IMQTTPublish service, DateTime from, DateTime to) =>
             {
                 return dBService.GetData(from.ToUniversalTime(), to.ToUniversalTime());
             });
-            app.MapPost("/testHub", (IMqttClientPublish service) =>
+            app.MapPost("/testHub", (IMQTTPublish service) =>
             {
                 return dBService.TestHub();
             });

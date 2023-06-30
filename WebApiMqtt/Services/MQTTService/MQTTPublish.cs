@@ -1,16 +1,9 @@
 ﻿using MQTTnet.Client;
 using MQTTnet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using static MQTTnet.Samples.Helpers.ObjectExtensions;
 
-namespace Services.MqttService
+namespace WebApiMqtt.Services.MQTTService
 {
-    public class MqttClientPublish : IMqttClientPublish
+    public class MQTTPublish : IMQTTPublish
     {
         public async Task Publish_Application_Message(string info)
         {
